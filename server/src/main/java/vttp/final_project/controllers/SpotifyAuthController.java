@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vttp.final_project.models.SpotifyTokens;
+import vttp.final_project.repositories.SpotifyTokenRepository;
 import vttp.final_project.services.SpotifyAuthService;
 
 @Controller
@@ -31,6 +33,9 @@ public class SpotifyAuthController {
 
     @Autowired
     private SpotifyAuthService spotifyAuthService;
+    
+    @Autowired
+    private SpotifyTokenRepository tokenRepository;
     
     @GetMapping
     public RedirectView startAuth(HttpServletRequest request) {
@@ -132,16 +137,40 @@ public class SpotifyAuthController {
     
     @GetMapping("/logout")
     public RedirectView logout(
-            HttpServletRequest request, 
+            HttpServletRequest request,
+            HttpServletResponse response,
             @RequestParam(required = false, defaultValue = "/login") String redirect) {
         
+        logger.info("Processing logout request");
         HttpSession session = request.getSession(false);
         if (session != null) {
             // Get user ID before invalidating session
             String userId = (String) session.getAttribute("userId");
+            logger.info("Logging out user ID: {}", userId);
+            
+            if (userId != null) {
+                // Delete the user's tokens from the database
+                logger.info("Deleting tokens for user ID: {}", userId);
+                tokenRepository.delete(userId);
+            }
             
             // Invalidate session
+            logger.info("Invalidating session: {}", session.getId());
             session.invalidate();
+            
+            // Clear the session cookie
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("JSESSIONID".equals(cookie.getName())) {
+                        logger.info("Clearing JSESSIONID cookie");
+                        cookie.setValue("");
+                        cookie.setPath("/");
+                        cookie.setMaxAge(0);
+                        response.addCookie(cookie);
+                    }
+                }
+            }
         }
         
         // Ensure the redirect starts with a slash and prepend the frontend URL
@@ -149,6 +178,7 @@ public class SpotifyAuthController {
             redirect = "/" + redirect;
         }
         
+        logger.info("Redirecting to: {}{}", frontendUrl, redirect);
         return new RedirectView(frontendUrl + redirect + "?logout=success");
     }
 }

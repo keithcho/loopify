@@ -55,6 +55,14 @@ export class AuthService {
   
   // Logout user
   logout(): void {
+    // Immediately update local state to prevent redirects
+    this.isAuthenticatedSubject.next(false);
+    
+    // Clear any local storage if present
+    localStorage.removeItem('spotify_auth');
+    sessionStorage.removeItem('spotify_auth');
+    
+    // Then redirect to server logout endpoint
     window.location.href = `${this.apiUrl}/auth/spotify/logout?redirect=/landing`;
   }
 }
