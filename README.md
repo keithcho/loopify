@@ -1,8 +1,8 @@
 # Loopify - AI-Powered Music Recommendation App
 
-Loopify is an advanced music recommendation application that leverages AI to analyze your Spotify playlists and listening habits to generate personalized song recommendations. Featuring seamless Spotify integration, an interactive music player with preview capabilities, and customizable recommendation prompts, Loopify helps you discover new music that truly aligns with your unique taste.
+🎵 Loopify is an advanced music recommendation application that leverages AI to analyze your Spotify playlists and listening habits to generate personalized song recommendations. Featuring seamless Spotify integration, an interactive music player with preview capabilities, and customizable recommendation prompts, Loopify helps you discover new music that truly aligns with your unique taste.
 
-![Loopify](https://via.placeholder.com/800x400)
+![Loopify](docs/capture1.png)
 
 ## Table of Contents
 - [Features](#features)
