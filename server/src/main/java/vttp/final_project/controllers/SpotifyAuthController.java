@@ -157,21 +157,28 @@ public class SpotifyAuthController {
             // Invalidate session
             logger.info("Invalidating session: {}", session.getId());
             session.invalidate();
-            
-            // Clear the session cookie
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("JSESSIONID".equals(cookie.getName())) {
-                        logger.info("Clearing JSESSIONID cookie");
-                        cookie.setValue("");
-                        cookie.setPath("/");
-                        cookie.setMaxAge(0);
-                        response.addCookie(cookie);
-                    }
+        }
+        
+        // Always clear the session cookie, even if session was null
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("JSESSIONID".equals(cookie.getName())) {
+                    logger.info("Clearing JSESSIONID cookie");
+                    cookie.setValue("");
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    cookie.setSecure(true);
+                    cookie.setHttpOnly(true);
+                    response.addCookie(cookie);
                 }
             }
         }
+        
+        // Add a response header to prevent caching
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
         
         // Ensure the redirect starts with a slash and prepend the frontend URL
         if (!redirect.startsWith("/")) {

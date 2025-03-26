@@ -55,14 +55,24 @@ export class AuthService {
   
   // Logout user
   logout(): void {
-    // Immediately update local state to prevent redirects
+    // Immediately update local state
     this.isAuthenticatedSubject.next(false);
     
     // Clear any local storage if present
     localStorage.removeItem('spotify_auth');
     sessionStorage.removeItem('spotify_auth');
     
-    // Then redirect to server logout endpoint
+    // Clear any other authentication-related data from storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Remove any cookies by setting them to expire in the past
+    document.cookie.split(";").forEach(cookie => {
+      const [name] = cookie.trim().split("=");
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+    
+    // Redirect to server logout endpoint
     window.location.href = `${this.apiUrl}/auth/spotify/logout?redirect=/landing`;
   }
 }

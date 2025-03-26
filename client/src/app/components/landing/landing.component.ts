@@ -29,13 +29,22 @@ export class LandingComponent implements OnInit, OnDestroy {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Check if user is already authenticated
-    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
-      if (isAuthenticated) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-
+    const urlParams = new URLSearchParams(window.location.search);
+    const logoutSuccess = urlParams.get('logout');
+    
+    if (logoutSuccess === 'success') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('logout');
+      window.history.replaceState({}, document.title, url.pathname);
+    } else {
+      // Check if user is already authenticated
+      this.authService.isAuthenticated$.subscribe(isAuthenticated => {
+        if (isAuthenticated) {
+          this.router.navigate(['/dashboard']);
+        }
+      });
+    }
+  
     this.startAutoScroll();
     this.initBackgroundShapes();
   }
