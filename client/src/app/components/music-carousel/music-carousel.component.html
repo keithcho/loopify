@@ -1,0 +1,50 @@
+<div class="music-carousel">
+  <!-- Carousel Container -->
+  <div class="carousel-container">
+    <!-- Previous Album (if available) -->
+    <div *ngIf="currentIndex > 0" 
+         class="album prev-album" 
+         [style.background-color]="getBackgroundColor(currentIndex-1)"
+         (click)="onPrevSong()">
+      <img *ngIf="getAlbumImageUrl(recommendations[currentIndex-1])" 
+           [src]="getAlbumImageUrl(recommendations[currentIndex-1])" 
+           alt="Previous album" 
+           class="album-image">
+      <div *ngIf="!getAlbumImageUrl(recommendations[currentIndex-1])" class="album-placeholder">
+        <div class="placeholder-circle"></div>
+      </div>
+    </div>
+    
+    <!-- Current Album -->
+    <div class="album current-album" 
+         [style.background-color]="getBackgroundColor(currentIndex)">
+      <img *ngIf="getAlbumImageUrl(recommendations[currentIndex])" 
+           [src]="getAlbumImageUrl(recommendations[currentIndex])" 
+           alt="Current album" 
+           class="album-image">
+      <div *ngIf="!getAlbumImageUrl(recommendations[currentIndex])" class="album-placeholder">
+        <div class="placeholder-circle"></div>
+      </div>
+    </div>
+    
+    <!-- Next Album (if available) -->
+    <div *ngIf="currentIndex < recommendations.length - 1" 
+         class="album next-album"
+         [style.background-color]="getBackgroundColor(currentIndex+1)"
+         (click)="onNextSong()">
+      <img *ngIf="getAlbumImageUrl(recommendations[currentIndex+1])" 
+           [src]="getAlbumImageUrl(recommendations[currentIndex+1])" 
+           alt="Next album" 
+           class="album-image">
+      <div *ngIf="!getAlbumImageUrl(recommendations[currentIndex+1])" class="album-placeholder">
+        <div class="placeholder-circle"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Song Info -->
+  <div class="song-info" *ngIf="recommendations?.length">
+    <h3 class="song-title">{{ getSongTitle(recommendations[currentIndex]) }}</h3>
+    <p class="artist-name">{{ getArtistName(recommendations[currentIndex]) }}</p>
+  </div>
+</div>

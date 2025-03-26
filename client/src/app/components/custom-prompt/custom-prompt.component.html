@@ -1,0 +1,17 @@
+<div class="prompt-customization">
+  <h3>Customize Your Recommendations</h3>
+  <div class="input-container">
+    <input 
+      type="text" 
+      placeholder="Example: 'More upbeat songs' or 'Similar to jazz'"
+      [(ngModel)]="customPrompt"
+      (keyup.enter)="submitPrompt()">
+    <button (click)="submitPrompt()" [disabled]="isApplyingPrompt">
+      {{ isApplyingPrompt ? 'Applying...' : 'Apply' }}
+    </button>
+  </div>
+  <p *ngIf="activeCustomPrompt" class="active-prompt">
+    <strong>Active Prompt:</strong> "{{ activeCustomPrompt }}"
+    <button class="reset-button" (click)="resetPrompt()">Reset</button>
+  </p>
+</div>

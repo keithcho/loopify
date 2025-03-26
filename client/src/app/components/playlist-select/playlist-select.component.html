@@ -1,0 +1,177 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+  <!-- Dynamic Background Elements -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden" style="z-index: -1;">
+    <div class="absolute top-[10%] left-[20%] w-40 h-40 rounded-full bg-purple-500 opacity-20 blur-3xl background-blob-1"></div>
+    <div class="absolute bottom-[15%] right-[25%] w-60 h-60 rounded-full bg-blue-500 opacity-20 blur-3xl background-blob-2"></div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h1 class="text-3xl font-bold tracking-wider" style="background: linear-gradient(to right, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Spotify Playlists</h1>
+      <button class="px-4 py-2 bg-purple-600 rounded-full text-sm font-bold hover:bg-purple-700 transition flex items-center gap-2" (click)="backToDashboard()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Dashboard
+      </button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="mt-8 mb-6">
+      <div class="relative max-w-md mx-auto">
+        <input 
+          type="text" 
+          placeholder="Search your playlists..." 
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          class="w-full px-5 py-3 bg-gray-800 bg-opacity-60 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition pl-10"
+        />
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+          <ng-container *ngIf="vm$ | async as vm">
+            <div *ngIf="vm.fetchingAllPlaylists" class="mr-2">
+              <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-purple-500"></div>
+            </div>
+            <button *ngIf="vm.searchQuery" (click)="clearSearch()" class="text-gray-400 hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+      <!-- Search status message -->
+      <ng-container *ngIf="vm$ | async as vm">
+        <div *ngIf="vm.searchQuery && vm.searchActive && vm.allPlaylistsFetched" class="text-center text-sm text-gray-400 mt-2">
+          Searched across {{ vm.pagination.total }} playlists ({{ vm.filteredPlaylists.length }} matches found)
+        </div>
+        <div *ngIf="vm.searchQuery && vm.searchActive && vm.fetchingAllPlaylists" class="text-center text-sm text-gray-400 mt-2">
+          <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-purple-500 mr-2"></div>
+            Fetching all playlists for complete search...
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    
+    <ng-container *ngIf="vm$ | async as vm">
+      <!-- Loading State -->
+      <div *ngIf="vm.loading && !vm.searchActive" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+      
+      <!-- Error State -->
+      <div *ngIf="vm.error" class="bg-red-900 bg-opacity-50 rounded-xl p-6 my-6">
+        <p class="text-red-200">{{ vm.error }}</p>
+        <button (click)="fetchPlaylists()" class="mt-2 px-4 py-2 bg-red-600 rounded-full text-sm font-bold">
+          Try Again
+        </button>
+      </div>
+      
+      <!-- Table Container -->
+      <div *ngIf="(vm.playlists.length && !vm.loading && !vm.error) || (vm.searchActive && vm.fetchingAllPlaylists)" class="bg-gray-900 bg-opacity-60 rounded-xl overflow-hidden shadow-xl">
+        <div class="p-4 border-b border-gray-700">
+          <h2 class="text-xl font-bold">All Playlists</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-800 bg-opacity-80">
+              <tr>
+                <th class="py-3 px-4 text-left">#</th>
+                <th class="py-3 px-4 text-left">Cover</th>
+                <th class="py-3 px-4 text-left">Name</th>
+                <th class="py-3 px-4 text-center">Tracks</th>
+                <th class="py-3 px-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              <!-- Use the displayedPlaylists from the view model -->
+              <tr *ngFor="let playlist of vm.displayedPlaylists; let i = index" 
+                  class="hover:bg-gray-800 hover:bg-opacity-50 transition-colors">
+                <td class="py-3 px-4">{{ (vm.pagination.offset || 0) + i + 1 }}</td>
+                <td class="py-3 px-4">
+                  <img *ngIf="playlist.images && playlist.images.length" 
+                       [src]="playlist.images[0].url" 
+                       alt="Playlist cover" 
+                       class="w-12 h-12 rounded">
+                  <div *ngIf="!playlist.images || !playlist.images.length" 
+                       class="w-12 h-12 rounded bg-gradient-to-r from-indigo-700 to-purple-700 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 18V5l12-2v13"></path>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-medium">{{ playlist.name }}</div>
+                </td>
+                <td class="py-3 px-4 text-center text-gray-300">
+                  {{ playlist.tracks.total }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="flex justify-center">
+                    <button (click)="selectPlaylist(playlist)" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-sm font-bold hover:opacity-90 transition">
+                      Select
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Pagination - Only show when not in search mode -->
+      <div *ngIf="vm.playlists.length && !vm.loading && !vm.error && !vm.searchActive" class="flex justify-between items-center mt-8 mb-12">
+        <div class="text-sm text-gray-400">
+          {{ pageInfo$ | async }}
+        </div>
+        <div class="flex gap-3">
+          <button [disabled]="!vm.pagination.hasPrevious" 
+                  (click)="previousPage()" 
+                  class="px-4 py-2 bg-gray-800 bg-opacity-60 rounded-lg flex items-center gap-1 hover:bg-opacity-80 transition disabled:opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Previous
+          </button>
+          <button [disabled]="!vm.pagination.hasNext" 
+                  (click)="nextPage()" 
+                  class="px-4 py-2 bg-gray-800 bg-opacity-60 rounded-lg flex items-center gap-1 hover:bg-opacity-80 transition disabled:opacity-50">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search Results Count - Show only when in search mode -->
+      <div *ngIf="vm.searchActive && !vm.loading && !vm.error" class="mt-8 mb-12 text-center">
+        <div class="text-sm text-gray-400">
+          Showing all {{ vm.filteredPlaylists.length }} matching playlists
+        </div>
+      </div>
+
+      <!-- Empty Results Message -->
+      <div *ngIf="vm.searchActive && vm.filteredPlaylists.length === 0 && !vm.fetchingAllPlaylists && !vm.loading" 
+      class="bg-gray-900 bg-opacity-60 rounded-xl p-8 my-6 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4 text-gray-500">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <h3 class="text-xl font-bold mb-2">No playlists found</h3>
+        <p class="text-gray-400">No playlists match your search query "{{ vm.searchQuery }}"</p>
+        <button (click)="clearSearch()" class="mt-4 px-4 py-2 bg-purple-600 rounded-full text-sm font-bold hover:bg-purple-700 transition">
+          Clear Search
+        </button>
+      </div>
+    </ng-container>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+    <p>&copy; 2025 Loopify • All rights reserved</p>
+  </footer>
+</div>

@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+  <!-- Dynamic Background Elements -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden" style="z-index: -1;">
+    <div class="absolute top-[10%] left-[20%] w-40 h-40 rounded-full bg-purple-500 opacity-20 blur-3xl background-blob-1"></div>
+    <div class="absolute bottom-[15%] right-[25%] w-60 h-60 rounded-full bg-blue-500 opacity-20 blur-3xl background-blob-2"></div>
+  </div>
+  
+  <!-- Top Navigation -->
+  <header class="p-6 flex justify-between items-center max-w-6xl mx-auto">
+    <div class="text-2xl font-bold tracking-wider">Loopify</div>
+    <div class="flex items-center gap-4">
+      <button class="px-4 py-2 bg-purple-600 rounded-full text-sm font-bold hover:bg-purple-700 transition mr-2">
+        Dashboard
+      </button>
+      <button (click)="logout()" class="px-4 py-2 bg-red-600 rounded-full text-sm font-bold hover:bg-red-700 transition">
+        Logout
+      </button>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-6 py-8">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-red-900 bg-opacity-50 rounded-xl p-6 my-6">
+      <p class="text-red-200">{{ error }}</p>
+      <button (click)="fetchUserProfile()" class="mt-2 px-4 py-2 bg-red-600 rounded-full text-sm font-bold">
+        Try Again
+      </button>
+    </div>
+    
+    <!-- Profile Section -->
+    <section *ngIf="profile && !loading && !error" class="mb-12 bg-gray-800 bg-opacity-50 rounded-xl p-6 backdrop-blur-sm">
+      <div class="flex items-center gap-6">
+        <div class="relative">
+          <img 
+            *ngIf="profile.images && profile.images.length" 
+            [src]="profile.images[0].url" 
+            alt="Profile" 
+            class="w-24 h-24 rounded-full object-cover border-2 border-purple-500"
+          />
+          <div *ngIf="!profile.images || !profile.images.length" 
+              class="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center border-2 border-purple-500">
+            <span class="text-2xl">{{ profile.display_name?.charAt(0) || 'U' }}</span>
+          </div>
+          <div class="absolute -bottom-2 -right-2 bg-green-500 w-5 h-5 rounded-full border-2 border-gray-800"></div>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold mb-1">{{ profile.display_name }}</h1>
+          <div class="flex items-center gap-4 text-sm text-gray-300">
+            <span>{{ profile.followers?.total || 0 }} followers</span>
+            <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
+            <span *ngIf="profile.country">Country: {{ profile.country }}</span>
+            <span *ngIf="profile.email">{{ profile.email }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Recommendation Options -->
+    <section *ngIf="profile && !loading && !error" class="mb-12">
+      <h2 class="text-2xl font-bold mb-6" style="background: linear-gradient(to right, #a78bfa, #93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Get Recommendations</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div (click)="fetchPlaylists()" class="bg-gradient-to-br from-purple-900 to-purple-700 rounded-xl p-6 transform hover:scale-[1.02] transition-transform cursor-pointer shadow-lg">
+          <div class="mb-4 text-4xl">🎵</div>
+          <h3 class="text-xl font-bold mb-2">From Your Playlists</h3>
+          <p class="text-gray-300 text-sm">Discover new music based on your favorite playlists.</p>
+        </div>
+        
+        <div (click)="goToTopTracks()" class="bg-gradient-to-br from-blue-900 to-blue-700 rounded-xl p-6 transform hover:scale-[1.02] transition-transform cursor-pointer shadow-lg">
+          <div class="mb-4 text-4xl">🔍</div>
+          <h3 class="text-xl font-bold mb-2">From Your Top Tracks</h3>
+          <p class="text-gray-300 text-sm">Find new songs that match your most played music.</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Recently Played Section -->
+    <section *ngIf="profile && !loading && !error && recentlyPlayed?.length" class="mb-12">
+      <h2 class="text-2xl font-bold mb-6" style="background: linear-gradient(to right, #ec4899, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Recently Played</h2>
+      <div class="flex overflow-x-auto pb-4 gap-4 hide-scrollbar">
+        <div *ngFor="let track of recentlyPlayed; let i = index" 
+             class="min-w-[180px] bg-gray-800 bg-opacity-60 rounded-lg p-4 hover:bg-opacity-80 transition-all"
+             [style.box-shadow]="'0 6px 12px -2px rgba(' + (111 + i * 20) + ', ' + (99 + i * 40) + ', ' + (230 - i * 30) + ', 0.3)'">
+          <div class="w-full aspect-square mb-3 rounded-md overflow-hidden">
+            <img *ngIf="track.album?.images?.length" [src]="track.album.images[0].url" alt="{{ track.name }}" class="w-full h-full object-cover" />
+            <div *ngIf="!track.album?.images?.length" class="w-full h-full bg-gray-700 flex items-center justify-center text-3xl">
+              🎵
+            </div>
+          </div>
+          <h3 class="font-bold text-sm mb-1 truncate">{{ track.name }}</h3>
+          <p class="text-xs text-gray-400">{{ track.artists[0]?.name }}</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Your Playlists Section -->
+    <section *ngIf="profile && !loading && !error && getPlaylistItems()?.length">
+      <h2 class="text-2xl font-bold mb-6" style="background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Playlists</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let playlist of getPlaylistItems() | slice:0:6" 
+             class="bg-gray-800 bg-opacity-60 rounded-lg overflow-hidden hover:bg-opacity-80 transition-all cursor-pointer shadow-md"
+             (click)="selectPlaylist(playlist)">
+          <div class="flex p-4 items-center gap-4">
+            <img *ngIf="playlist.images && playlist.images.length" 
+                 [src]="playlist.images[0].url" 
+                 alt="{{ playlist.name }}" 
+                 class="w-16 h-16 rounded-md object-cover" />
+            <div *ngIf="!playlist.images || !playlist.images.length" 
+                 class="w-16 h-16 rounded-md bg-gray-700 flex items-center justify-center text-2xl">
+              🎵
+            </div>
+            <div class="overflow-hidden">
+              <h3 class="font-bold text-base mb-1 truncate">{{ playlist.name }}</h3>
+              <p class="text-xs text-gray-400">{{ playlist.tracks.total }} tracks</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="playlists && playlists.items && playlists.items.length > 6" class="text-center mt-6">
+        <button (click)="fetchPlaylists()" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full text-sm font-bold hover:opacity-90 transition">
+          View All Playlists
+        </button>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="mt-12 py-6 text-center text-gray-500 text-sm">
+    <p>&copy; {{ currentYear }} Loopify • All rights reserved</p>
+  </footer>
+</div>

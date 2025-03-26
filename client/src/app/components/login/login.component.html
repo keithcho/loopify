@@ -1,0 +1,15 @@
+<div>
+  <h1>Spotify Integration</h1>
+  
+  <div *ngIf="error">
+    <p style="color: red;">{{ error }}</p>
+  </div>
+  
+  <div *ngIf="logoutMessage">
+    <p>{{ logoutMessage }}</p>
+  </div>
+  
+  <p>Connect your Spotify account to use this application.</p>
+  
+  <button (click)="login()">Login with Spotify</button>
+</div>

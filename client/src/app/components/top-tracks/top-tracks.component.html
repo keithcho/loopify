@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+  <!-- Background Elements -->
+  <div class="background-blob-1"></div>
+  <div class="background-blob-2"></div>
+  
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h1>Your Spotify Top Tracks</h1>
+      <button (click)="backToDashboard()">Back to Dashboard</button>
+    </div>
+    
+    <!-- Time Range Selector -->
+    <div class="time-range-selector">
+      <label for="timeRange">Time Period:</label>
+      <div class="select-wrapper">
+        <select id="timeRange" [(ngModel)]="selectedTimeRange" (change)="onTimeRangeChange()">
+          <option *ngFor="let range of timeRanges" [value]="range.value">{{ range.label }}</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Loading your top tracks...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="error" class="error-section">
+      <p>{{ error }}</p>
+      <button (click)="fetchTopTracks()">Try Again</button>
+    </div>
+    
+    <!-- Top Tracks Section -->
+    <div *ngIf="topTracks && topTracks.length > 0 && !loading && !error" class="tracks-container">
+      <!-- Recommendations Button -->
+      <div class="recommendation-button">
+        <button (click)="getRecommendations()">Get Recommendations Based on Your Top Tracks</button>
+      </div>
+      
+      <!-- Tracks Table -->
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cover</th>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Album</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let track of topTracks; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>
+              <img *ngIf="track.album && track.album.images && track.album.images.length" 
+                  [src]="track.album.images[track.album.images.length - 1].url" 
+                  alt="Album cover">
+              <div *ngIf="!track.album?.images?.length" class="w-10 h-10 bg-gray-700 flex items-center justify-center text-lg rounded">
+                🎵
+              </div>
+            </td>
+            <td>{{ track.name }}</td>
+            <td>{{ track.artists[0].name }}</td>
+            <td>{{ track.album.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="topTracks && topTracks.length === 0 && !loading && !error" class="empty-tracks-message">
+      <div class="text-4xl mb-4">🎵</div>
+      <p>No top tracks found for this time period. Try selecting a different time range.</p>
+    </div>
+  </div>
+</div>
