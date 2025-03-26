@@ -177,7 +177,7 @@ public class GeminiRedisService {
      * Clears all cached recommendations and custom prompts
      */
     public void clearAllCaches() {
-        // Find all keys with our prefixes
+        // Find all keys with prefixes
         redisTemplate.delete(redisTemplate.keys(RECOMMENDATIONS_KEY_PREFIX + "*"));
         redisTemplate.delete(redisTemplate.keys(CUSTOM_PROMPT_KEY_PREFIX + "*"));
         

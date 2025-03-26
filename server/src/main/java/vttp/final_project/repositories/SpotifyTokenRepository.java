@@ -62,17 +62,4 @@ public class SpotifyTokenRepository {
         String sql = "DELETE FROM spotify_tokens WHERE user_id = ?";
         jdbcTemplate.update(sql, userId);
     }
-    
-    // Schema creation method (for initial setup)
-    public void createTableIfNotExists() {
-        String sql = "CREATE TABLE IF NOT EXISTS spotify_tokens (" +
-                     "user_id VARCHAR(255) PRIMARY KEY," +
-                     "access_token TEXT NOT NULL," +
-                     "refresh_token TEXT NOT NULL," +
-                     "access_token_expiry TIMESTAMP NOT NULL," +
-                     "scope TEXT," +
-                     "issued_at TIMESTAMP NOT NULL" +
-                     ")";
-        jdbcTemplate.execute(sql);
-    }
 }

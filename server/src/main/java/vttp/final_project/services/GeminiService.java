@@ -173,7 +173,7 @@ public class GeminiService {
             }
             
             // If this is a new request or we need more recommendations than we have cached
-            int recommendationsToGenerate = 30; // Generate more than requested to have a buffer
+            int recommendationsToGenerate = 30;
             if (cachedRecommendations != null) {
                 // Generate more recommendations to add to cache
                 logger.info("Generating more recommendations to add to cache for playlist {}", playlistId);
@@ -197,7 +197,6 @@ public class GeminiService {
             String prompt;
             
             if (cachedRecommendations == null || cachedRecommendations.isEmpty()) {
-                // Initial request - Modified to include custom prompt if provided
                 prompt = "Based on the following playlist tracks:\n\n" + 
                         tracksString + 
                         "\n\nRecommend " + recommendationsToGenerate + " new songs that would fit well with this playlist. ";

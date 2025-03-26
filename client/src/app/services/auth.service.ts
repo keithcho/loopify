@@ -30,8 +30,6 @@ export class AuthService {
   
   // Initial auth check based on local data
   private checkInitialAuthStatus(): boolean {
-    // We don't have a token to check locally since everything is managed by the backend session
-    // This is just a placeholder that will be updated soon by the checkAuthStatus call
     return false;
   }
   

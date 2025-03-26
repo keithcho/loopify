@@ -65,11 +65,10 @@ public class GeminiController {
         ResponseEntity<?> playlistResponse = spotifyService.getPlaylistById(request, playlistId);
         
         if (!playlistResponse.getStatusCode().is2xxSuccessful()) {
-            return playlistResponse; // Return the error response if playlist fetch failed
+            return playlistResponse;
         }
         
         // Pass the playlist data to GeminiService to get recommendations with limit and offset
-        // Also pass the custom prompt if available
         ResponseEntity<?> recommendationsResponse = geminiService.getSongRecommendationsForPlaylist(
                 playlistResponse.getBody(), limit, offset, customPrompt);
         

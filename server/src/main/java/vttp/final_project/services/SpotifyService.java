@@ -94,9 +94,6 @@ public class SpotifyService {
             );
 
             PlaylistsDTO playlists = response.getBody();
-            // logger.info("Parsed PlaylistsDTO: total={}, items.size={}", 
-            //         playlists.getTotal(), 
-            //         playlists.getItems().size());
 
             return ResponseEntity.ok(playlists);
         } catch (Exception e) {

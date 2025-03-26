@@ -27,7 +27,7 @@ public class FallbackService {
         logger.info("Generating fallback recommendations based on {} playlist tracks", 
                 playlistTracks != null ? playlistTracks.size() : 0);
         
-        // Check if we have any tracks to analyze
+        // Check if we have any tracks to analyse
         if (playlistTracks == null || playlistTracks.isEmpty()) {
             // If no tracks, provide diverse popular songs from different genres
             addFallbackRecommendation(fallbacks, "Bohemian Rhapsody", "");
@@ -46,7 +46,7 @@ public class FallbackService {
             addFallbackRecommendation(fallbacks, "I Want to Hold Your Hand", "");
             addFallbackRecommendation(fallbacks, "Johnny B. Goode", "");
         } else {
-            // Analyze the playlist to determine a general style/genre
+            // Analyse the playlist to determine a general style/genre
             List<String> rockArtists = List.of("queen", "beatles", "rolling stones", "led zeppelin", 
                     "ac/dc", "guns n' roses", "nirvana", "radiohead", "pink floyd", "u2");
                     

@@ -59,9 +59,6 @@ public class SpotifyApiController {
         return spotifyService.getPlaylistById(request, playlistId);
     }
 
-    // Apply the same pattern to the other methods
-    // For example:
-    
     @GetMapping("/tracks")
     public ResponseEntity<?> getSeveralTracks(HttpServletRequest request,
         @RequestParam String ids) {
@@ -94,9 +91,7 @@ public class SpotifyApiController {
         @RequestParam(defaultValue = "0") int offset) {
         
         apiMetricsService.incrementApiCounter("/api/spotify/top-tracks");
-        
-        // Rest of the existing method...
-        
+
         return spotifyService.getUserTopTracks(request, timeRange, limit, offset);
     }
 }

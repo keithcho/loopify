@@ -8,7 +8,7 @@ export interface RecommendationWithPreview {
   success: boolean;
   recommendation: {
     song_title: string;
-    artist: string;  // This will now be populated from Spotify API data
+    artist: string;
   };
   track?: any;
   previewUrls?: string[];
@@ -58,7 +58,6 @@ export class SpotifyService {
       });
   }
 
-  // Reverted back to void return type to match original implementation
   fetchPlaylists(limit: number = 5, offset: number = 0): void {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
@@ -81,8 +80,6 @@ export class SpotifyService {
   }
   
   getPlaylistsObservable(limit: number = 20, offset: number = 0): Observable<PlaylistCollection> {
-    // Don't set loading state on main subject to avoid affecting the UI when fetching batches
-    // Only set loading when explicitly requested
     const setGlobalLoading = limit <= 20 && offset === 0;
     
     if (setGlobalLoading) {
@@ -172,16 +169,12 @@ export class SpotifyService {
         console.log(`Recommendations received (offset ${offset}):`, recommendations);
         
         if (includePreviewUrls) {
-          // If these are enhanced recommendations with preview URLs
-          
-          // Artist information is now coming from Spotify API in the enhanced recommendations
+
           this.enhancedRecommendationsSubject.next(recommendations);
           
-          // Also update the simple recommendations subject for backward compatibility
           const simpleRecommendations = recommendations.map(item => item.recommendation || item);
           this.recommendationsSubject.next(simpleRecommendations);
         } else {
-          // Simple recommendations without preview URLs
           this.recommendationsSubject.next(recommendations);
           this.enhancedRecommendationsSubject.next([]);
         }

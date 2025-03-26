@@ -123,7 +123,6 @@ public class SpotifyPreviewService {
             }
         }
         
-        // For other formats, just truncate the query
         return sanitizeAndTruncate(query);
     }
     
